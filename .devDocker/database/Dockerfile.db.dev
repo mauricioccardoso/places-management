@@ -1,0 +1,8 @@
+# Use the latest version of Postgres as the base image
+FROM postgres:17
+
+# Modify the UID and GID of the 'postgres' user to be 1000
+RUN usermod -u 1000 postgres && groupmod -g 1000 postgres
+
+# Change ownership of the Postgres data directory to the 'postgres' user and group
+RUN chown -R postgres:postgres /var/lib/postgresql/data

@@ -1,0 +1,37 @@
+services:
+  places-api:
+    build:
+      context: .devDocker/backend
+      dockerfile: Dockerfile.dev
+    container_name: places-api
+    restart: unless-stopped
+    command: wait-for places-db:5432 -t 120 -- /usr/local/bin/start.sh
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/home/php/backend
+    depends_on:
+      - places-db
+    networks:
+      - places-network
+
+  places-db:
+    build:
+      context: .devDocker/database
+      dockerfile: Dockerfile.db.dev
+    container_name: places-db
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8081:5432"
+    volumes:
+      - ./.devDocker/database/_dbData:/var/lib/postgresql/data
+    networks:
+      - places-network
+
+networks:
+  places-network:
+    driver: bridge
