@@ -8,7 +8,6 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UserController extends Controller
@@ -20,17 +19,12 @@ class UserController extends Controller
     {
         $userData = $request->validated();
 
-        DB::beginTransaction();
         try {
             $user = User::create($userData);
 
-            DB::commit();
-
-            return new UserResource($user);
+            return response()->json(new UserResource($user), 201);
 
         } catch (\Throwable $th) {
-            DB::rollBack();
-
             $error = 'Falha ao criar usuário.';
             Logger::log($th, $error);
 
@@ -50,7 +44,7 @@ class UserController extends Controller
         try {
             $user = User::findOrFail($userId);
 
-            return new UserResource($user);
+            return response()->json(new UserResource($user));
 
         } catch (\Throwable $th) {
             $error = 'Usuário não encontrado.';
@@ -76,7 +70,7 @@ class UserController extends Controller
             );
             $user->update($userDataFiltered);
 
-            return new UserResource($user);
+            return response()->json(new UserResource($user));
 
         } catch (\Throwable $th) {
 
