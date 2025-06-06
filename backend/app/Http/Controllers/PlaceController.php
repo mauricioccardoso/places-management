@@ -14,7 +14,52 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class PlaceController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/api/place",
+     *     summary="Listar lugares",
+     *     tags={"Lugares"},
+     *     @OA\Parameter(
+     *         name="name",
+     *         in="query",
+     *         description="Filtrar pelo nome",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="slug",
+     *         in="query",
+     *         description="Filtrar pela slug",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="city",
+     *         in="query",
+     *         description="Filtrar pela cidade",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="state",
+     *         in="query",
+     *         description="Filtrar pelo estado",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de lugares",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="name", type="string"),
+     *                 @OA\Property(property="slug", type="string"),
+     *                 @OA\Property(property="city", type="string"),
+     *                 @OA\Property(property="state", type="string"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *         )
+     *     )
+     *     ),
+     * )
      */
     public function index(Request $request)
     {
@@ -36,7 +81,33 @@ class PlaceController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/place",
+     *     summary="Criar um lugar",
+     *     tags={"Lugares"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "city", "state"},
+     *             @OA\Property(property="name", type="string", maxLength=62),
+     *             @OA\Property(property="city", type="string", maxLength=62),
+     *             @OA\Property(property="state", type="string", maxLength=62)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Lugar criado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="slug", type="string"),
+     *             @OA\Property(property="city", type="string"),
+     *             @OA\Property(property="state", type="string"),
+     *             @OA\Property(property="created_at", type="string"),
+     *             @OA\Property(property="updated_at", type="string")
+     *         )
+     *     )
+     * )
      */
     public function store(StorePlaceRequest $request)
     {
@@ -60,7 +131,30 @@ class PlaceController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/api/place/{id}",
+     *     summary="Exibir lugar",
+     *     tags={"Lugares"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lugar encontrado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="slug", type="string"),
+     *             @OA\Property(property="city", type="string"),
+     *             @OA\Property(property="state", type="string"),
+     *             @OA\Property(property="created_at", type="string"),
+     *             @OA\Property(property="updated_at", type="string")
+     *         )
+     *     )
+     * )
      */
     public function show(int $placeId)
     {
@@ -78,7 +172,34 @@ class PlaceController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/place/{placeId}",
+     *     summary="Atualizar lugar",
+     *     tags={"Lugares"},
+     *     @OA\Parameter(name="placeId", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string", maxLength=62),
+     *             @OA\Property(property="city", type="string", maxLength=62, nullable=true),
+     *             @OA\Property(property="state", type="string", maxLength=62, nullable=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lugar atualizado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="slug", type="string"),
+     *             @OA\Property(property="city", type="string"),
+     *             @OA\Property(property="state", type="string"),
+     *             @OA\Property(property="created_at", type="string"),
+     *             @OA\Property(property="updated_at", type="string")
+     *         )
+     *     )
+     * )
      */
     public function update(UpdatePlaceRequest $request, int $placeId)
     {
@@ -113,7 +234,17 @@ class PlaceController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/place/{id}",
+     *     summary="Deletar lugar",
+     *     tags={"Lugares"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Lugar deletado com sucesso",
+     *         @OA\JsonContent(example={})
+     *     )
+     * )
      */
     public function destroy(int $placeId)
     {
