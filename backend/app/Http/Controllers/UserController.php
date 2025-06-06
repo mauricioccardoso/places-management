@@ -13,7 +13,31 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class UserController extends Controller
 {
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/user",
+     *     summary="Criar usuário",
+     *     tags={"Usuários"},
+     *     security={},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","email","password","password_confirmation"},
+     *             @OA\Property(property="name", type="string", minLength=3),
+     *             @OA\Property(property="email", type="string", format="email"),
+     *             @OA\Property(property="password", type="string", format="password", minLength=8),
+     *             @OA\Property(property="password_confirmation", type="string", format="password", minLength=8)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Usuário criado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="email", type="string")
+     *         )
+     *     ),
+     * )
      */
     public function store(StoreUserRequest $request)
     {
@@ -33,7 +57,26 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Get(
+     *     path="/api/user/{id}",
+     *     summary="Exibir usuário",
+     *     tags={"Usuários"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Usuário encontrado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="email", type="string")
+     *         )
+     *     ),
+     * )
      */
     public function show(int $userId)
     {
@@ -55,7 +98,35 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/user/{id}",
+     *     summary="Atualizar usuário",
+     *     tags={"Usuários"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", minLength=3),
+     *             @OA\Property(property="email", type="string", format="email"),
+     *             @OA\Property(property="password", type="string", format="password", minLength=8, nullable=true),
+     *             @OA\Property(property="password_confirmation", type="string", format="password", minLength=8, nullable=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Usuário atualizado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer"),
+     *             @OA\Property(property="name", type="string"),
+     *             @OA\Property(property="email", type="string")
+     *         )
+     *     ),
+     * )
      */
     public function update(UpdateUserRequest $request, int $userId)
     {
@@ -82,7 +153,22 @@ class UserController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/user/{id}",
+     *     summary="Excluir usuário",
+     *     tags={"Usuários"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Usuário excluído",
+     *         @OA\JsonContent(example={})
+     *     ),
+     * )
      */
     public function destroy(int $userId)
     {
@@ -92,6 +178,8 @@ class UserController extends Controller
 
         try {
             $user = User::findOrFail($userId);
+
+            $user->tokens()->delete();
 
             $user->delete();
 
